@@ -1,0 +1,11 @@
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\bin\Release\Microsoft.ApplicationBlocks.ApplicationUpdater.dll
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\bin\Release\Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.dll
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\bin\Release\Microsoft.ApplicationBlocks.ExceptionManagement.dll
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\bin\Release\Microsoft.ApplicationBlocks.ExceptionManagement.Interfaces.dll
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\bin\Release\Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.pdb
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\bin\Release\Microsoft.ApplicationBlocks.ExceptionManagement.pdb
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\bin\Release\Microsoft.ApplicationBlocks.ExceptionManagement.Interfaces.pdb
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\obj\Release\ResolveAssemblyReference.cache
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\obj\Release\Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdaterText.resources
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\obj\Release\Microsoft.ApplicationBlocks.ApplicationUpdater.csproj.GenerateResource.Cache
+C:\Documents and Settings\admin\Documenti\Visual Studio 2008\Projects\CP-100\SMS\Microsoft.ApplicationBlocks.ApplicationUpdater\obj\Release\Microsoft.ApplicationBlocks.ApplicationUpdater.dll

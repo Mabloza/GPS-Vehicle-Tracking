@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema id="ConfigSchema" elementFormDefault="unqualified" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:complexType name="appUpdater">
+		<xs:sequence>
+			<xs:element name="UpdaterConfiguration" type="UpdaterConfiguration" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="UpdaterConfiguration">
+		<xs:sequence>
+			<xs:element name="polling" type="polling" minOccurs="1" maxOccurs="1" />
+			<xs:element name="logListener" type="logListener" minOccurs="0" maxOccurs="1" />
+			<xs:element name="downloader" type="downloader" minOccurs="1" maxOccurs="1" />
+			<xs:element name="validator" type="validator" minOccurs="1" maxOccurs="1" />
+			<xs:element name="application" type="application" minOccurs="1" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="logListener">
+		<xs:sequence />
+		<xs:attribute name="logPath" type="xs:string"  use="required" />
+	</xs:complexType>
+	
+	<xs:complexType name="polling">
+		<xs:sequence />
+		<xs:attribute name="type" type="xs:string" use="required" />
+		<xs:attribute name="value" type="xs:string"  use="required" />
+	</xs:complexType>
+	
+	<xs:complexType name="downloader">
+		<xs:sequence>
+			<xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="type" type="xs:string"  use="required" />
+		<xs:attribute name="assembly" type="xs:string"  use="required" />
+	</xs:complexType>
+	
+	<xs:complexType name="validator">
+		<xs:sequence>
+			<xs:any processContents="skip" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="type" type="xs:string"  use="required" />
+		<xs:attribute name="assembly" type="xs:string"  use="required" />
+	</xs:complexType>
+	
+	<xs:complexType name="application">
+		<xs:sequence>
+			<xs:element name="client" type="client" minOccurs="1" maxOccurs="1" />
+			<xs:element name="server" type="server" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string"  use="required" />
+		<xs:attribute name="useValidation" type="xs:boolean"  use="required" />
+	</xs:complexType>
+	
+	<xs:complexType name="client">
+		<xs:sequence>
+			<xs:element name="baseDir" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="xmlFile" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="tempDir" type="xs:string" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="server">
+		<xs:sequence>
+			<xs:element name="xmlFile" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="xmlFileDest" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="maxWaitXmlFile" type="xs:integer" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="appUpdater" type="appUpdater"></xs:element>
+</xs:schema>

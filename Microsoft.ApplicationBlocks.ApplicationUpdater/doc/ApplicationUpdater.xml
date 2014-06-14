@@ -1,0 +1,1731 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.ApplicationBlocks.ApplicationUpdater</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterActionEventHandler">
+            <summary>
+            This delegate provides the signature for UpdaterAction events
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager">
+            <summary>
+            The main Application Updater class; entry point for all applications that will consume the Updater's API;
+            coordinates activities of DownloaderManager(s) 
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.SetupDownloadManager(Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationConfiguration)">
+            <summary>
+            Does all the setup of a DownloaderManager, including using Factories to construct Validators and Downloaders that it will use.
+            Builds all the stuff up, constructs the DownloaderManager.  Packages the Mgr with its Thread in a DnldMgrHolder struct and returns it.
+            **NOTE:  this follows a variant of the Builder Pattern, where we delegate constuction of a complex object.
+            could also have been in a separate Builder or Factory class but small enough to put here.
+            </summary>
+            <param name="application">the name of the Updater target application</param>
+            <returns>DnldMgrHolder struct containing Built DownloaderManager and the Thread it will run on</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.StartUpdater">
+            <summary>
+            Updater start method
+            </summary>
+            <remarks>
+            This method iterates through the applications to update, and starts each on its own thread
+            </remarks>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.StopUpdater">
+            <summary>
+            Stops all updates
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.StopUpdater(System.String)">
+            <summary>
+            Stops a specific update by application name
+            </summary>
+            <param name="appName">the name of the application to stop updating</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.StopUpdaterHelper(System.Object)">
+            <summary>
+            stops all updates if no appname was specified, but only one if appname specified to original StopUpdater( name ) call
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.StopUpdaterHelper(System.String)">
+            <summary>
+            Internal helper, stops the specified DownloadManager by application name 
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.RestartUpdater(System.String)">
+            <summary>
+            Restarts a badly-exited DownloaderManager--managers may throw fatal errors, we want to restart them to 
+            be sure target app gets updated.  Uses a Timer internally to provide a delay before restarting to prevent 
+            rapid-cycling of restarts; the timer in turn calls this method's helper to actually restart.
+            </summary>
+            <param name="appName">name of the application update to restart (name defined in config)</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.RestartUpdaterHelper(System.Object)">
+            <summary>
+            This method helps restart the app.  It expects a DnldMgrHolder to be packaged in the object argument; it unpacks this holder
+            and starts the downloadermanager it contains on the thread it contains
+            </summary>
+            <param name="state">an object wrapper around a DnldMgrHolder</param>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.ServerManifestDownloaded">
+            <summary>
+            signifies the Server Manifest has been downloaded locally and is ready for processing
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.UpdateAvailable">
+            <summary>
+            signals that a new version is available for download on the server.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.DownloadStarted">
+             <summary>
+            signals download started with UpdaterActionEventArgs containing manifest info
+             </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.DownloadCompleted">
+            <summary>
+            signals download complete with server manifest info
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.ManifestValidated">
+            <summary>
+            signals the server manifest validated successfully.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.ManifestValidationFailed">
+            <summary>
+            signals the server manifest FAILED to validate.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.FilesValidated">
+            <summary>
+            signals the downloaded files validated successfully.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdateManager.FilesValidationFailed">
+            <summary>
+            signals the downloaded files FAILED to validate successfully.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdaterException">
+            <summary>
+            General exception for the application updater application block
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdaterException.#ctor">
+            <summary>
+            A default constructor
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdaterException.#ctor(System.String)">
+            <summary>
+            Creates an exception using a message
+            </summary>
+            <param name="message">The message</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdaterException.#ctor(System.String,System.Exception)">
+            <summary>
+            Creates an exception with a message and an inner exception
+            </summary>
+            <param name="message">The message</param>
+            <param name="innerException">The inner exception</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationUpdaterException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            constructor for use by serialization
+            </summary>
+            <param name="si"></param>
+            <param name="context"></param>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader">
+            <summary>
+            The BITS downloader provider for AppUpdater.  BITS is a service available on Windows 2000 and above.  It uses a robust, 
+            asynchronous HTTP download mechanism that can recover gracefully from disconnects, and utilizes only spare bandwidth.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IDownloader#Init(System.Xml.XmlNode)">
+            <summary>
+            Initializes the BITSDownloader (not used)
+            </summary>
+            <param name="config">xml node which might contain config information used by downloader to set up</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IDownloader#Download(System.String,System.String,System.TimeSpan)">
+            <summary>
+            Synchronous downloading method using BITS
+            </summary>
+            <param name="sourceFile">Source file to download</param>
+            <param name="destFile">Target file on the local system</param>
+            <param name="maxTimeWait">Maximum time to wait for a download</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IDownloader#BeginDownload(System.String[],System.String[])">
+            <summary>
+            Supports multiple simultaneous downloads asynchronously.  Starts the job immediately and returns a GUID while the download continues.
+            </summary>
+            <param name="sourceFile">a string array of source files, which MUST BE URL's they cannot be UNC paths</param>
+            <param name="destFile">a string array of destination paths which MUST BE UNC's they cannot be URL paths</param>
+            <returns>a GUID which is a job id for future reference</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IDownloader#GetJobStatus(System.Guid)">
+            <summary>
+            returns a job status enum for a particular job identified by its GUID
+            </summary>
+            <param name="jobId">a guid for the job requested</param>
+            <returns>a JobStatus describing the state of the job</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.RemoveCopyJobEntry(System.Guid)">
+            <summary>
+            Removes a copy job from the internal lookup collection
+            </summary>
+            <param name="jobID">GUID identifies of a job (job id)</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.CreateCopyJob(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyManager@,Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob@,System.Guid@,System.String,System.String)">
+            <summary>
+            Internal copy-job factory method.  Used to coordinate all aspects of a job set-up, 
+            which includes creating a copy manager, creating a job within it, setting download
+            parameters, and adding the job to our tracking collection for cleanup later
+            </summary>
+            <param name="copyManager">null reference to copy manager</param>
+            <param name="copyJob">null reference to copy job</param>
+            <param name="jobID">null reference to job id guid</param>
+            <param name="jobNameKey">the key used to look up the job name in the resource file</param>
+            <param name="jobDescriptionKey">the key used to look up the job description in the resource file</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.HandleDownloadErrorCancelJob(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob,System.String@)">
+            <summary>
+            Centralizes all chores related to stopping and cancelling a copy job, and getting back
+            from BITS the errors incurred during the job.
+            </summary>
+            <param name="copyJob">reference to the copy job object (not job id)</param>
+            <param name="errMessage">a cumulative error message passed by reference so
+            that additions can be made</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.ThrowIfSourceIsUNC(System.String)">
+            <summary>
+            Checks the download source location; BITS can only accept HTTP/HTTPS, so if
+            we are given a UNC path as source, we need to stop right away--misconfiguration
+            </summary>
+            <param name="sourceFile">the path to the update file's source</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.Dispose">
+            <summary>
+            Allows graceful cleanup of hard resources
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.Dispose(System.Boolean)">
+            <summary>
+            used by externally visible overload.
+            </summary>
+            <param name="isDisposing">whether or not to clean up managed + unmanaged/large (true) or just unmanaged(false)</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BITSDownloader.Finalize">
+            <summary>
+            Destructor/Finalizer
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BackgroundCopyManager">
+            <summary>
+            BackgroundCopyManager Class
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyManager">
+            <summary>
+            Use the IBackgroundCopyManager interface to create transfer jobs, 
+            retrieve an enumerator object that contains the jobs in the queue, 
+            and to retrieve individual jobs from the queue.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyManager.CreateJob(System.String,Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_TYPE,System.Guid@,Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob@)">
+            <summary>
+            Creates a new transfer job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyManager.GetJob(System.Guid@,Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob@)">
+            <summary>
+            Retrieves a given job from the queue
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyManager.EnumJobs(System.UInt32,Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyJobs@)">
+            <summary>
+            Retrieves an enumerator object that you use to enumerate jobs in the queue
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyManager.GetErrorDescription(System.Int32,System.UInt32,System.String@)">
+            <summary>
+            Retrieves a description for the given error code
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob">
+            <summary>
+            Use the IBackgroundCopyJob interface to add files to the job, 
+            set the priority level of the job, determine the state of the
+            job, and to start and stop the job.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.AddFileSet(System.UInt32,Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_INFO@)">
+            <summary>
+            Adds multiple files to the job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.AddFile(System.String,System.String)">
+            <summary>
+            Adds a single file to the job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.EnumFiles(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyFiles@)">
+            <summary>
+            Returns an interface pointer to an enumerator
+            object that you use to enumerate the files in the job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.Suspend">
+            <summary>
+            Pauses the job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.Resume">
+            <summary>
+            Restarts a suspended job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.Cancel">
+            <summary>
+            Cancels the job and removes temporary files from the client
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.Complete">
+            <summary>
+            Ends the job and saves the transferred files on the client
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetId(System.Guid@)">
+            <summary>
+            Retrieves the identifier of the job in the queue
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetType(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_TYPE@)">
+            <summary>
+            Retrieves the type of transfer being performed, 
+            such as a file download
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetProgress(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_PROGRESS@)">
+            <summary>
+            Retrieves job-related progress information, 
+            such as the number of bytes and files transferred 
+            to the client
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetTimes(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_TIMES@)">
+            <summary>
+            Retrieves timestamps for activities related
+            to the job, such as the time the job was created
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetState(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE@)">
+            <summary>
+            Retrieves the state of the job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetError(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyError@)">
+            <summary>
+            Retrieves an interface pointer to 
+            the error object after an error occurs
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetOwner(System.String@)">
+            <summary>
+            Retrieves the job owner's identity
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.SetDisplayName(System.String)">
+            <summary>
+            Specifies a display name that identifies the job in 
+            a user interface
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetDisplayName(System.String@)">
+            <summary>
+            Retrieves the display name that identifies the job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.SetDescription(System.String)">
+            <summary>
+            Specifies a description of the job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetDescription(System.String@)">
+            <summary>
+            Retrieves the description of the job
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.SetPriority(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PRIORITY)">
+            <summary>
+            Specifies the priority of the job relative to 
+            other jobs in the transfer queue
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetPriority(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PRIORITY@)">
+            <summary>
+            Retrieves the priority level you have set for the job.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.SetNotifyFlags(System.UInt32)">
+            <summary>
+            Specifies the type of event notification to receive
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetNotifyFlags(System.UInt32@)">
+            <summary>
+            Retrieves the event notification (callback) flags 
+            you have set for your application.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.SetNotifyInterface(System.Object)">
+            <summary>
+            Specifies a pointer to your implementation of the 
+            IBackgroundCopyCallback interface (callbacks). The 
+            interface receives notification based on the event 
+            notification flags you set
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetNotifyInterface(System.Object@)">
+            <summary>
+            Retrieves a pointer to your implementation 
+            of the IBackgroundCopyCallback interface (callbacks).
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.SetMinimumRetryDelay(System.UInt32)">
+            <summary>
+            Specifies the minimum length of time that BITS waits after 
+            encountering a transient error condition before trying to 
+            transfer the file
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetMinimumRetryDelay(System.UInt32@)">
+            <summary>
+            Retrieves the minimum length of time that BITS waits after 
+            encountering a transient error condition before trying to 
+            transfer the file
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.SetNoProgressTimeout(System.UInt32)">
+            <summary>
+            Specifies the length of time that BITS continues to try to 
+            transfer the file after encountering a transient error 
+            condition
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetNoProgressTimeout(System.UInt32@)">
+            <summary>
+            Retrieves the length of time that BITS continues to try to 
+            transfer the file after encountering a transient error condition
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetErrorCount(System.UInt32@)">
+            <summary>
+            Retrieves the number of times the job was interrupted by 
+            network failure or server unavailability
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.SetProxySettings(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PROXY_USAGE,System.String,System.String)">
+            <summary>
+            Specifies which proxy to use to transfer the files
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.GetProxySettings(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PROXY_USAGE@,System.String@,System.String@)">
+            <summary>
+            Retrieves the proxy settings the job uses to transfer the files
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob.TakeOwnership">
+            <summary>
+            Changes the ownership of the job to the current user
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyError">
+            <summary>
+            Use the information in the IBackgroundCopyError interface to 
+            determine the cause of the error and if the transfer process 
+            can proceed
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyError.GetError(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT@,System.Int32@)">
+            <summary>
+            Retrieves the error code and identify the context 
+            in which the error occurred
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyError.GetFile(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyFile@)">
+            <summary>
+            Retrieves an interface pointer to the file object 
+            associated with the error
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyError.GetErrorDescription(System.UInt32,System.String@)">
+            <summary>
+            Retrieves the error text associated with the error
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyError.GetErrorContextDescription(System.UInt32,System.String@)">
+            <summary>
+            Retrieves a description of the context in which the error occurred
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyError.GetProtocol(System.String@)">
+            <summary>
+            Retrieves the protocol used to transfer the file
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyJobs">
+            <summary>
+            Use the IEnumBackgroundCopyJobs interface to enumerate the list 
+            of jobs in the transfer queue. To get an IEnumBackgroundCopyJobs 
+            interface pointer, call the IBackgroundCopyManager::EnumJobs method
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyJobs.Next(System.UInt32,Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyJob@,System.UInt32@)">
+            <summary>
+            Retrieves a specified number of items in the enumeration sequence
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyJobs.Skip(System.UInt32)">
+            <summary>
+            Skips a specified number of items in the enumeration sequence
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyJobs.Reset">
+            <summary>
+            Resets the enumeration sequence to the beginning.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyJobs.Clone(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyJobs@)">
+            <summary>
+            Creates another enumerator that contains the same 
+            enumeration state as the current one
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyJobs.GetCount(System.UInt32@)">
+            <summary>
+            Returns the number of items in the enumeration
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyFiles">
+            <summary>
+            Use the IEnumBackgroundCopyFiles interface to enumerate the files 
+            that a job contains. To get an IEnumBackgroundCopyFiles interface 
+            pointer, call the IBackgroundCopyJob::EnumFiles method
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyFiles.Next(System.UInt32,Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyFile@,System.UInt32@)">
+            <summary>
+            Retrieves a specified number of items in the enumeration sequence
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyFiles.Skip(System.UInt32)">
+            <summary>
+            Skips a specified number of items in the enumeration sequence
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyFiles.Reset">
+            <summary>
+            Resets the enumeration sequence to the beginning
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyFiles.Clone(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyFiles@)">
+            <summary>
+            Creates another enumerator that contains the same 
+            enumeration state as the current enumerator
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IEnumBackgroundCopyFiles.GetCount(System.UInt32@)">
+            <summary>
+            Retrieves the number of items in the enumeration
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyFile">
+            <summary>
+             The IBackgroundCopyFile interface contains information about a file 
+             that is part of a job. For example, you can use the interfaces methods
+             to retrieve the local and remote names of the file and transfer progress
+             information
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyFile.GetRemoteName(System.String@)">
+            <summary>
+            Retrieves the remote name of the file
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyFile.GetLocalName(System.String@)">
+            <summary>
+            Retrieves the local name of the file
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.IBackgroundCopyFile.GetProgress(Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_PROGRESS@)">
+            <summary>
+            Retrieves the progress of the file transfer
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE">
+            <summary>
+            The BG_JOB_STATE enumeration type defines constant values for the 
+            different states of a job
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_QUEUED">
+            <summary>
+            Specifies that the job is in the queue and waiting to run. 
+            If a user logs off while their job is transferring, the job 
+            transitions to the queued state
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_CONNECTING">
+            <summary>
+            Specifies that BITS is trying to connect to the server. If the 
+            connection succeeds, the state of the job becomes 
+            BG_JOB_STATE_TRANSFERRING; otherwise, the state becomes 
+            BG_JOB_STATE_TRANSIENT_ERROR
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_TRANSFERRING">
+            <summary>
+            Specifies that BITS is transferring data for the job
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_SUSPENDED">
+            <summary>
+            Specifies that the job is suspended (paused)
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_ERROR">
+            <summary>
+            Specifies that a non-recoverable error occurred (the service is 
+            unable to transfer the file). When the error can be corrected, 
+            such as an access-denied error, call the IBackgroundCopyJob::Resume 
+            method after the error is fixed. However, if the error cannot be 
+            corrected, call the IBackgroundCopyJob::Cancel method to cancel 
+            the job, or call the IBackgroundCopyJob::Complete method to accept 
+            the portion of a download job that transferred successfully.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_TRANSIENT_ERROR">
+            <summary>
+            Specifies that a recoverable error occurred. The service tries to 
+            recover from the transient error until the retry time value that 
+            you specify using the IBackgroundCopyJob::SetNoProgressTimeout method 
+            expires. If the retry time expires, the job state changes to 
+            BG_JOB_STATE_ERROR
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_TRANSFERRED">
+            <summary>
+            Specifies that your job was successfully processed
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_ACKNOWLEDGED">
+            <summary>
+            Specifies that you called the IBackgroundCopyJob::Complete method 
+            to acknowledge that your job completed successfully
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_CANCELLED">
+            <summary>
+            Specifies that you called the IBackgroundCopyJob::Cancel method to 
+            cancel the job (remove the job from the transfer queue)
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_UPDATE_AVAILABLE">
+            <summary>
+            This is custom state not provided by BITS to indicate that an Update
+            is available for the application.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_VALIDATION_SUCCESS">
+            <summary>
+            This is custom state not provided by BITS to indicate that an validation
+            of the application files was successful.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_STATE.BG_JOB_STATE_VALIDATION_FAILED">
+            <summary>
+            This is custom state not provided by BITS to indicate that an validation
+            of the application files was failed.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_TYPE">
+            <summary>
+            The BG_JOB_TYPE enumeration type defines constant values that you 
+            use to specify the type of transfer job, such as download
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_TYPE.BG_JOB_TYPE_DOWNLOAD">
+            <summary>
+            Specifies that the job downloads files to the client
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PROXY_USAGE">
+            <summary>
+            The BG_JOB_PROXY_USAGE enumeration type defines constant values 
+            that you use to specify which proxy to use for file transfers
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PROXY_USAGE.BG_JOB_PROXY_USAGE_PRECONFIG">
+            <summary>
+            Use the proxy and proxy bypass list settings defined by each 
+            user to transfer files
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PROXY_USAGE.BG_JOB_PROXY_USAGE_NO_PROXY">
+            <summary>
+            Do not use a proxy to transfer files
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PROXY_USAGE.BG_JOB_PROXY_USAGE_OVERRIDE">
+            <summary>
+            Use the application's proxy and proxy bypass list to transfer files
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PRIORITY">
+            <summary>
+            The BG_JOB_PRIORITY enumeration type defines the constant values 
+            that you use to specify the priority level of the job
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PRIORITY.BG_JOB_PRIORITY_FOREGROUND">
+            <summary>
+            Transfers the job in the foreground
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PRIORITY.BG_JOB_PRIORITY_HIGH">
+            <summary>
+            Transfers the job in the background. This is the highest background 
+            priority level. 
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PRIORITY.BG_JOB_PRIORITY_NORMAL">
+            <summary>
+            Transfers the job in the background. This is the default priority 
+            level for a job
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_JOB_PRIORITY.BG_JOB_PRIORITY_LOW">
+            <summary>
+            Transfers the job in the background. This is the lowest background 
+            priority level
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT">
+            <summary>
+            The BG_ERROR_CONTEXT enumeration type defines the constant values 
+            that specify the context in which the error occurred
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT.BG_ERROR_CONTEXT_NONE">
+            <summary>
+            An error has not occurred
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT.BG_ERROR_CONTEXT_UNKNOWN">
+            <summary>
+            The error context is unknown
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT.BG_ERROR_CONTEXT_GENERAL_QUEUE_MANAGER">
+            <summary>
+            The transfer queue manager generated the error
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT.BG_ERROR_CONTEXT_QUEUE_MANAGER_NOTIFICATION">
+            <summary>
+            The error was generated while the queue manager was 
+            notifying the client of an event
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT.BG_ERROR_CONTEXT_LOCAL_FILE">
+            <summary>
+            The error was related to the specified local file. For example, 
+            permission was denied or the volume was unavailable
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT.BG_ERROR_CONTEXT_REMOTE_FILE">
+            <summary>
+            The error was related to the specified remote file. 
+            For example, the URL is not accessible
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders.BG_ERROR_CONTEXT.BG_ERROR_CONTEXT_GENERAL_TRANSPORT">
+            <summary>
+            The transport layer generated the error. These errors are general 
+            transport failures; errors not specific to the remote file
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_INFO">
+            <summary>
+            The BG_FILE_INFO structure provides the local and 
+            remote names of the file to transfer
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_INFO.RemoteName">
+            <summary>
+            Remote Name for the File
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_INFO.LocalName">
+            <summary>
+            Local Name for the file
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_PROGRESS">
+            <summary>
+            The BG_JOB_PROGRESS structure provides job-related progress information, 
+            such as the number of bytes and files transferred
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_PROGRESS.BytesTotal">
+            <summary>
+            Total number of bytes to transfer for the job.
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_PROGRESS.BytesTransferred">
+            <summary>
+            Number of bytes transferred
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_PROGRESS.FilesTotal">
+            <summary>
+            Total number of files to transfer for this job
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_PROGRESS.FilesTransferred">
+            <summary>
+            Number of files transferred. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_TIMES">
+            <summary>
+            The BG_JOB_TIMES structure provides job-related timestamps
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_TIMES.CreationTime">
+            <summary>
+            Time the job was created
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_TIMES.ModificationTime">
+            <summary>
+            Time the job was last modified or bytes were transferred
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_JOB_TIMES.TransferCompletionTime">
+            <summary>
+            Time the job entered the BG_JOB_STATE_TRANSFERRED state
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._FILETIME">
+            <summary>
+            FILETIME Structure
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._FILETIME.dwLowDateTime">
+            <summary>
+            Description
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._FILETIME.dwHighDateTime">
+            <summary>
+            Description
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_PROGRESS">
+            <summary>
+            The BG_FILE_PROGRESS structure provides file-related progress information, 
+            such as the number of bytes transferred
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_PROGRESS.BytesTotal">
+            <summary>
+            Size of the file in bytes
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_PROGRESS.BytesTransferred">
+            <summary>
+            Number of bytes transferred. 
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Downloaders._BG_FILE_PROGRESS.Completed">
+            <summary>
+            For downloads, the value is TRUE if the file is available to the user; 
+            otherwise, the value is FALSE
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterSectionHandler">
+            <summary>
+            Main configuration section handler
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterSectionHandler.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterSectionHandler.ValidateConfiguration(System.Xml.XmlNode)">
+            <summary>
+            This helper method uses the XSD schema to validate the Updater configuration xml file.  It also does some logical checks.
+            If anything is out of order, it throws an exception here before Updater processing can go any further.
+              NOTE:  configuration is the single most important aspect of Updater setup, it MUST be correct
+            </summary>
+            <param name="section">the xmlnode containing the Updater configuration file</param>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager">
+            <summary>
+            1)  Manages the Downloader and Validator, 
+            2)  coordinates their activities, 
+            3)  copies the files/directories created
+            4)  raises events at each step
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.#ctor(Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IDownloader,Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IValidator,Microsoft.ApplicationBlocks.ApplicationUpdater.DownloadJobStatusEntry,System.Threading.ManualResetEvent,Microsoft.ApplicationBlocks.ApplicationUpdater.BadExitCallback)">
+            <summary>
+            Only constructor for DownloaderManager.  All parameters required for proper function.
+            </summary>
+            <param name="downloader">instance of IDownloader implementation</param>
+            <param name="validator">instance of IValidator implementation</param>
+            <param name="downloadJob">encapsulation of Job information in DownloadJobStatusEntry instance, such as app name job status job id</param>
+            <param name="mustStop">an MRE used by Updater to tell this object it must clean up and leave or be Interrupt()ed</param>
+            <param name="badExitCbk">delegate instance this class will call on on unrecoverable error, such as an unanticpated exception that compromises too badly to contine</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.RunDownloader">
+            **
+            ***    MAIN METHOD                        
+            **
+             <summary>
+             This is the main method.
+             </summary>
+             <remarks>This method does the following tasks:<list>
+             <item>1. Get the server metadata information</item>
+             <item>2. Compare server version with client versoins</item>
+             <item>3. Start the download process if some local files are old.</item>
+             </list></remarks>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.IsServerManifestDownloaded">
+            <summary>
+            Download the metadata from the server using the synchronous method
+            from the IDownloader interface.
+            </summary>
+            <returns>true if the manifest downloaded and exists as a file at the correct path</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.DownloadApplicationFiles">
+            <summary>
+             Determine the files to be downloaded and call the IDownloader to perform the job
+            </summary>
+            <returns>the job id guid</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.IsPollerIntervalElapsed">
+            <summary>
+            This figures out how many milliseconds to wait--or, if using ExtendedFormat, queries the helper to find if time has elapsed.  If time 
+            has elapsed, it returns (true if the MRE is set, signalling that ApplicationUpdaterManager has signalled to stop)
+            allowing a new download cycle to begin.  Otherwise, it loops internally, polling the IDownloader for job status.
+            
+            </summary>
+            <returns>true if we were interrupted (The MustStopUpdating event is signaled)</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.CheckDownloadCompleteOrError">
+            <summary>
+            Checks job status; if job is NOT downloading, returns immediately--these status 
+            settings indicate the job is "in process"
+            Then queries IDownloader instance for job status.  If job is "Ready", set job status
+            to "validating" and initiates validation.  For all other status, sets job status 
+            to returned status and returns from function.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.IsClientUpdateNeeded">
+            <summary>
+            This method compares the recently downloaded file with the client version. 
+            If the server version is greater compared with the client version, the 
+            return value is <c>true</c>.
+            </summary>
+            <returns>true if client version older than server</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.ValidateFilesAndCleanup">
+            <summary>
+            Given a particular application name, cycles through each downloaded file and verifies using IValidator object;
+            also first validates Manifest;
+            if even one file fails, it deletes them all;
+            when complete and if successful, it updates the clienConfig.xml file with new version info based on download.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.RunPostProcessor">
+            <summary>
+            Using manifest information in node @"<postProcessor type='' assembly=''></postProcessor>", 
+            this instantiates the object.  The object MUST implement IPostProcessor interface.  That interface
+            has a single method "void Run()"
+            The object is used to do post-update actions such as run custom installers, make event logs, clean up 
+            old installs, etc.
+            
+              NOTE:  
+            The PostProcessor runs from a thread _spawned by this thread_, and under _THIS_ security context.  
+            Therefore if AppUpdater 
+            is running as a high-privilege user, the PostProcessor can do quite a bit...BE CAREFUL.
+            ALSO note that _we are using a separate thread_, so PostProcessor does NOT block this thread.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.ValidateFiles">
+            <summary>
+            If validation is enabled, which it SHOULD be except for debugging purposes, this walks through all
+            files in the server config Files collection gleaned from the Manifest, and uses our instance of 
+            IValidator to check each file against its signature.
+            </summary>
+            <returns>false if any file fails validation</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.RemoveManifestAndTempFiles">
+            <summary>
+            Deletes the Manifest and the Temp directories, including all contents/files
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.StopPostProcessorThread">
+            <summary>
+            Wraps the stopping of the IPP thread; this thread ventures outside and does work through IPP.Run(), may take a while; 
+            we may need to reign it in, so stopping + error collection code here.
+            Common errors in IPP thread:  TheadInterruptedException + TAE, or frank Exception if those not properly handled.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.ManifestValidated">
+            <summary>
+              THIS EVENT:  signals the server manifest validated successfully.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.ManifestValidationFailed">
+            <summary>
+              THIS EVENT:  signals the server manifest FAILED to validate.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.FilesValidated">
+            <summary>
+              THIS EVENT:  signals the downloaded files validated successfully.
+            </summary>
+        </member>
+        <member name="E:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderManager.FilesValidationFailed">
+            <summary>
+              THIS EVENT:  signals the downloaded files FAILED to validate successfully.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ExtendedFormat">
+            <summary>
+            This class represents a extended format 
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ExtendedFormatHelper">
+            <summary>
+            This class tests if a item was expired using a extended format
+            </summary>
+            <remarks>
+            Extended format syntax : <br/><br/>
+            
+            Minute       - 0-59 <br/>
+            Hour         - 0-23 <br/>
+            Day of month - 1-31 <br/>
+            Month        - 1-12 <br/>
+            Day of week  - 0-6 (Sunday is 0) <br/>
+            Wildcards    - * means run every <br/>
+            Examples: <br/>
+            * * * * *    - expires every minute<br/>
+            5 * * * *    - expire 5th minute of every hour <br/>
+            * 21 * * *   - expire every minute of the 21st hour of every day <br/>
+            31 15 * * *  - expire 3:31 PM every day <br/>
+            7 4 * * 6    - expire Saturday 4:07 AM <br/>
+            15 21 4 7 *  - expire 9:15 PM on 4 July <br/>
+            </remarks>
+            
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ExtendedFormatHelper.IsExtendedExpired(System.String,System.DateTime,System.DateTime)">
+            <summary>
+            Test the extended format with a given date.
+            </summary>
+            <param name="format">The extended format arguments.</param>
+            <param name="getTime">The time when the item has been refreshed.</param>
+            <param name="nowTime">Always DateTime.Now, or the date to test with.</param>
+            <returns>true if the item was expired, otherwise false</returns>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility">
+            <summary>
+            Provides certain utilities used by configuration processors, such as correcting file paths
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.AppendSlashURLorUNC(System.String)">
+            <summary>
+            Takes a UNC or URL path, determines which it is (NOT hardened against bad strings, assumes one or the other is present)
+            and returns the path with correct trailing slash--UNC==back URL==forward
+            </summary>
+            <param name="path">URL or UNC</param>
+            <returns>path with correct terminal slash</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.ConvertToUNCPath(System.String)">
+            <summary>
+            Takes url-friendly paths such as "/foo/bar/file.txt" and converts to UNC-friendly paths by simple substitution, 
+            --> "\foo\bar\file.txt"
+            </summary>
+            <param name="path">the url path</param>
+            <returns>the UNC path</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.AppendTerminalBackSlash(System.String)">
+            <summary>
+            If not present appends terminal backslash to paths
+            </summary>
+            <param name="path">path for example "C:\AppUpdaterClient"</param>
+            <returns>path with trailing backslash--"C:\AppUpdaterClient\"</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.AppendTerminalForwardSlash(System.String)">
+            <summary>
+            Appends a terminal forward-slash if there is not already one, returns corrected path
+            </summary>
+            <param name="path">the path that may be missing a terminal forward-slash</param>
+            <returns>the corrected path with terminal forward-slash</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.GetRootDirectoryFromFilePath(System.String)">
+            <summary>
+            Given a file path such as "C:\foo\file.txt" this extracts the local root directory path, "C:\foo\" 
+            complete with terminal backslash
+            </summary>
+            <param name="path">the full file path</param>
+            <returns>the local root directory (strips terminal file name)</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.DeleteDirectory(System.String)">
+            <summary>
+            Used to delete a directory and all its contents.  
+            </summary>
+            <param name="path">full path to directory</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.DeleteFile(System.String)">
+            <summary>
+            Used to delete a file  
+            </summary>
+            <param name="path">full path to file</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.CopyDirectory(System.String,System.String)">
+            <summary>
+            Copy files from source to destination directories.  Directory.Move not suitable here because
+            downloader may still have temp dir locked
+            </summary>
+            <param name="sourcePath">source path</param>
+            <param name="destPath">destination path</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileUtility.CopyDirRecurse(System.String,System.String)">
+            <summary>
+            Utility function that recursively copies directories and files.
+            Again, we could use Directory.Move but we need to preserve the original.
+            </summary>
+            <param name="sourcePath"></param>
+            <param name="destinationPath"></param>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.GenericFactory">
+            <summary>
+            Acts as the basic implementation for the multiple Factory classes used in the Updater.
+            We need to create instances based on config info for the flexible object types...
+            Have Factories for those, and since there's much common code for doing Reflection-based activation 
+            keep that code in one central place.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.GenericFactory.SplitType(System.String,System.String@,System.String@)">
+            <summary>
+            Utility method that splits a full type name (assembly + type) into the constituent five parts, trims those parts, and throws an error if there are not exactly five members.
+            </summary>
+            <param name="fullType">the assembly + type names, fully qualified</param>
+            <param name="typeName">the type name, full</param>
+            <param name="assemblyName">they fully-qualified assembly name including name, version, culture, and public key token</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.GenericFactory.Create(System.String)">
+            <summary>
+            Returns an object instantiated by the Activator, using fully-qualified combined assembly-type  supplied.
+            Assembly parameter example: "Microsoft.ApplicationBlocks.ApplicationUpdater,Version=1.0.0.0,Culture=neutral,PublicKeyToken=null"
+            Type parameter example: "Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator"
+            </summary>
+            <param name="fullTypeName">fully-qualified assembly name and type name</param>
+            <returns>instance of requested assembly/type typed as System.Object</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.GenericFactory.Create(System.String,System.Type)">
+            <summary>
+            Uses a file path to load an assembly.  Then instantiates the requested type by searching interfaces.		
+            Returns an object instantiated by the Activator, using fully-qualified combined assembly-type  supplied.
+            Assembly parameter example: "Microsoft.ApplicationBlocks.ApplicationUpdater,Version=1.0.0.0,Culture=neutral,PublicKeyToken=null"
+            Type parameter example: "Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator"
+            </summary>
+            <param name="filePath">full path to assembly</param>
+            <param name="interfaceToActivate">the Type representing the interface to activate</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.GenericFactory.Create(System.String,System.String)">
+            <summary>
+            Returns an object instantiated by the Activator, using fully-qualified assembly + type  supplied.
+            Assembly parameter example: "Microsoft.ApplicationBlocks.ApplicationUpdater,Version=1.0.0.0,Culture=neutral,PublicKeyToken=null"
+            Type parameter example: "Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator"
+            </summary>
+            <param name="assemblyName">fully-qualified assembly name</param>
+            <param name="typeName">the type name</param>
+            <returns>instance of requested assembly/type typed as System.Object</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.GenericFactory.Create(System.String,System.String,System.Object[])">
+            <summary>
+            Returns an object instantiated by the Activator, using fully-qualified asm/type supplied.
+            Permits construction arguments to be supplied which it passes to the object's constructor on instantiation.
+            </summary>
+            <param name="assemblyName">fully-qualified assembly name</param>
+            <param name="typeName">the type name</param>
+            <param name="constructorArguments">constructor arguments for type to be created</param>
+            <returns>instance of requested assembly/type typed as System.Object</returns>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator">
+            <summary>
+            The symmetric-key-based implementation of the IValidator interface.  Does not offer same level of security as the asymmetric
+            RSA crypto.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.#ctor">
+            <summary>
+            The default constructor
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IValidator#Init(System.Xml.XmlNode)">
+            <summary>
+            Initialize the provider
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Init(System.String)">
+            <summary>
+            this overload permits direct passing of the base64-encoded key.  used as a convenience during testing
+            </summary>
+            <param name="key">base64-encoded key</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.ExtractKeyFromNode(System.Xml.XmlNode)">
+            <summary>
+            Helper function to get the base64-encoded key from the "key" node
+            </summary>
+            <param name="keyNode">contains the base64 encoded key hash</param>
+            <returns>byte array which is the key decoded from base64</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IValidator#Validate(System.String,System.String)">
+            <summary>
+            Validate the file given by hashing it using a keyed-hash, and comparing the resulting signature to
+            the given signature.  Return true if they match.
+            </summary>
+            <param name="filePath">full or relative path to file</param>
+            <param name="signature">the original signature of the file as obtained from the server</param>
+            <returns>true if signatures match, file is valid</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IValidator#Validate(System.Xml.XmlNode,System.String)">
+            <summary>
+            Validates the manifest root xml node against the signature it contains, detects false/tampered manifests
+            </summary>
+            <param name="xml">the contents of the manifest</param>
+            <param name="signature">the encrypted hash code of the contents of the manifest xml file</param>
+            <returns>true if the decrypted hash signature of the xml matches the hash of the xml generated here</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IValidator#Sign(System.String,System.String)">
+            <summary>
+            Reads the given file and creates a hash code that uses every byte of the file to contribute, then encrypts the resulting hash code using the key
+            in the KeyedHashAlgorithm
+            </summary>
+            <param name="filePath">full path to the file to sign</param>
+            <param name="key">the "secret" key used to "sign" the hash</param>
+            <returns>a base64-encoded string which is the encrypted signature of the file</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IValidator#Sign(System.Xml.XmlNode,System.String)">
+            <summary>
+            Reads the given xml and creates a hash code that uses every byte of the xml to contribute, then encrypts the resulting hash code using the key
+            in the KeyedHashAlgorithm
+            </summary>
+            <param name="xml">the node of xml to sign</param>
+            <param name="key">the "secret" key used to "sign" the hash</param>
+            <returns>a base64-encoded string which is the encrypted signature of the xml</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.compareKeys(System.Byte[],System.Byte[])">
+            <summary>
+            Compares two keys and return true if both are the same.
+            </summary>
+            <param name="firstKey">first key</param>
+            <param name="secondKey">second key</param>
+            <returns>true if two keys match byte-for-byte, false otherwise</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Dispose">
+            <summary>
+            Allows graceful cleanup of hard resources
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Dispose(System.Boolean)">
+            <summary>
+            used by externally visible overload.
+            Does nothing internally, since this validator does not hold onto any hard resources
+            </summary>
+            <param name="isDisposing">whether or not to clean up managed + unmanaged/large (true) or just unmanaged(false)</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.KeyValidator.Finalize">
+            <summary>
+            Destructor
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientApplicationInfo">
+            <summary>
+            Client config file definition
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientApplicationInfo.Deserialize(System.String)">
+            <summary>
+            Uses an XML file as source of data.  Populate a ClientApplicationInfo object and return it.
+            </summary>
+            <param name="filePath">The XML file path</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientApplicationInfo.Save(System.String,System.String,System.String)">
+            <summary>
+            Saves the client config file--usually AppStart.exe.config--with changes.
+            
+            </summary>
+            <param name="filePath">local path to config file</param>
+            <param name="appFolderName">path to client application's folder</param>
+            <param name="installedVersion">currently installed version (updated)</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientApplicationInfo.#ctor">
+            <summary>
+            Default public constructor
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientApplicationInfo.AppFolderName">
+            <summary>
+            The folder name for the application-- the base folder
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientApplicationInfo.AppExeName">
+            <summary>
+            The EXE name for the application within the given folder 
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientApplicationInfo.InstalledVersion">
+            <summary>
+            The installed version for the application.  
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo">
+            <summary>
+            Server config file definition
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo.Deserialize(System.String)">
+            <summary>
+            Deserializes the configuration in an XML file
+            </summary>
+            <param name="filePath">The XML file path</param>
+            <returns>ServerApplicationInfo object</returns>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo.PostProcessor">
+            <summary>
+            Holds an instance of post-processor info class 
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo.ManifestSignature">
+            <summary>
+            Stores the manifest-level "signature" or keyed hash which is used to validate contents of all nodes below root.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo.AvailableVersion">
+            <summary>
+            The available version on the server
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo.UpdateLocation">
+            <summary>
+            The URL OR UNC location of files on the server
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo.Files">
+            <summary>
+            The files available on the server--makes no assumption about URL- or UNC-ness
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.PostProcessorConfiguration">
+            <summary>
+            Encapsulates post-processor (IPostProcessing) information (type, assembly) used
+            to instantiate a post-processor after download and validation; 
+            post-processors allow higher-level install activities such as deleting old directories, installing queues, 
+            eventlogs, etc.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.PostProcessorConfiguration.#ctor">
+            <summary>
+            default constructor--not used
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.PostProcessorConfiguration.Assembly">
+            <summary>
+            The fully-qualified assembly
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.PostProcessorConfiguration.Type">
+            <summary>
+            The type
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.PostProcessorConfiguration.Name">
+            <summary>
+            The name, that is the file path
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.FileConfig">
+            <summary>
+            A file available on the server
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.FileConfig.#ctor">
+            <summary>
+            default constructor--not used
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.FileConfig.Name">
+            <summary>
+            The file name
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.FileConfig.UNCName">
+            <summary>
+            returns the UNC-friendly file path/name
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.FileConfig.Signature">
+            <summary>
+            The file signature
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Resource">
+            <summary>
+            Helper class used to manage application resources
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator">
+            <summary>
+            RSAValidator uses _asymmetric_ (public/private key pair) encryption using RSA, with a SHA1 hash to sign.
+            This is the stronger security-wise of the two implementations offered by Updater.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator.#ctor">
+            <summary>
+            default constructor.  Real work is done in Init.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator.Init(System.Xml.XmlNode)">
+            <summary>
+            Initialize the Validator with the Public Key.  This is cached after Init.
+            Also set up the RSA-CSP and the deformatter.
+            </summary>
+            <param name="config">xml node from which we expect to extract single node "key" containing RSA public key</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator.Validate(System.Xml.XmlNode,System.String)">
+            <summary>
+            Validate given xml node against the cryptographic signature using the PUBLIC key,
+            return true if the xml is the exactly original value
+            </summary>
+            <param name="xml">the node whose _inner xml_ will be validated--so first child is validated</param>
+            <param name="signature">the original signature, base64 encoded</param>
+            <returns>false if xml has been changed at all, true if not</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IValidator#Validate(System.String,System.String)">
+            <summary>
+            Validate given FILE against the cryptographic signature using the PUBLIC key
+            return true if the FILE is the exactly original value
+            </summary>
+            <param name="filePath">the path to the file to be validated</param>
+            <param name="signature">the original signature, base64 encoded</param>
+            <returns>false if FILE has been changed at all, true if not</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IValidator#Sign(System.Xml.XmlNode,System.String)">
+            <summary>
+            Creates a hash of the INNER xml and cryptographically signs it with the provided PRIVATE key
+            </summary>
+            <param name="xml">xml whose InnerXml will be signed</param>
+            <param name="key">the PRIVATE key of the key pair which must be kept secure</param>
+            <returns>the base64-encoded signed hash</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator.Microsoft#ApplicationBlocks#ApplicationUpdater#Interfaces#IValidator#Sign(System.String,System.String)">
+            <summary>
+            Creates a hash of the file and cryptographically signs it with the provided PRIVATE key
+            </summary>
+            <param name="filePath">path to file for signing</param>
+            <param name="key">the PRIVATE key of the key pair which must be kept secure</param>
+            <returns>the base64-encoded signed hash</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Validators.RSAValidator.Dispose">
+            <summary>
+            Used to clean up resources that might be finalized otherwise.  In this class there are no such resources but 
+            we must fulfill the IValidator interface contract.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterActionEventArgs">
+            <summary>
+            The Updater-specific derivation of System.EventArgs
+            Encapsulates information of interest to clients of the Updater events, so they can act on the information.
+            When Updater raises events, it creates this EventArg and populates it with the ServerApplicationInfo 
+            containing relevant information not known to the client--namely, server manifest information.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterActionEventArgs.#ctor(Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo)">
+            <summary>
+            constructor accepting just ServerApplicationInfo 
+            </summary>
+            <param name="serverInformation">server information</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterActionEventArgs.#ctor(System.String)">
+            <summary>
+            Constructor that accepts only application name
+            </summary>
+            <param name="appName">name of the application being Updated</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterActionEventArgs.#ctor(Microsoft.ApplicationBlocks.ApplicationUpdater.ServerApplicationInfo,System.String)">
+            <summary>
+            full constructor takes both items of information passed by this EventArgs derivative.
+            </summary>
+            <param name="serverInformation">server information</param>
+            <param name="appName">name of the application being Updated</param>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterActionEventArgs.ServerInformation">
+            <summary>
+            the encapsulation of server information from the Server Manifest File.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterActionEventArgs.ApplicationName">
+            <summary>
+            The application name for the application being updated.  Is stored in the Updater configuration file and may not necessarily be the real application name.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingType">
+            <summary>
+            The polling type for the updater service
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingType.Milliseconds">
+            <summary>
+            Specify interval in milliseconds
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingType.Seconds">
+            <summary>
+            Specify interval in seconds
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingType.Minutes">
+            <summary>
+            Specify interval in minutes
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingType.Hours">
+            <summary>
+            Specify interval in hours
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingType.Days">
+            <summary>
+            Specify interval in days
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingType.Weeks">
+            <summary>
+            Specify interval in weeks
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingType.ExtendedFormat">
+            <summary>
+            Specify interval using an extended format.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration">
+            <summary>
+            Main configiration class stored on the XML file. The configuration is stored
+            using Xml serialization so the configuration is the Xml representation for
+            this class and its related classes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration.#ctor">
+            <summary>
+            default ctor
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration.Instance">
+            <summary>
+            Returns the singleton of UpdaterConfiguration created during construction
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration.Logging">
+            <summary>
+            process the logListener element of config so we can store log location for Trace output
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration.Polling">
+            <summary>
+            The interval between server polling
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration.Downloader">
+            <summary>
+            The downloader provider. The class configured must implement IDownloader
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration.Validator">
+            <summary>
+            The validator provider. The class configured must implement IValidator
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration.Applications">
+            <summary>
+            The list of applications defined on the XML file
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.UpdaterConfiguration.Item(System.String)">
+            <summary>
+            indexer iterates array of applications, returns one matching the name
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.LoggingListener">
+            <summary>
+            The LoggingListener class encapsulates the "logListener" element of config file, and puts the "logPath" attribute in a file path string.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.LoggingListener.LogPath">
+            <summary>
+            The LOCAL file path to a log file which will be written during operation of the Updater
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingConfiguration">
+            <summary>
+            The polling configuration
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingConfiguration.Type">
+            <summary>
+            The PollingType for the updater service
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.PollingConfiguration.Value">
+            <summary>
+            The value for the type specified.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientConfiguration">
+            <summary>
+            Defines the client configuration for a given application
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientConfiguration.XmlFile">
+            <summary>
+            The AppStart.exe.config, or the config of the application that directly consumes Updater, OR the config of the
+            Service EXE that controls Updater.  NOTE:  this is the so-called "Controller" config.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientConfiguration.BaseDir">
+            <summary>
+            The client base directory--MUST be a file path not URL
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ClientConfiguration.TempDir">
+            <summary>
+            The temp dir used to download files before validated--MUST be a file path not URL
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerConfiguration">
+            <summary>
+            The server configuration for a given application
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerConfiguration.ServerManifestFile">
+            <summary>
+            The Server Manifest location from which we download.  MAY be a URL OR A UNC, so make no assumptions
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerConfiguration.ServerManifestFileDestination">
+            <summary>
+            Destination of the Server Manifest file on the local machine--MUST be a file path, NOT URL
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ServerConfiguration.MaxWaitXmlFile">
+            <summary>
+            Maximum time to wait for the metadata file to download
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationConfiguration">
+            <summary>
+            The application configuration
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationConfiguration.Name">
+            <summary>
+            The application name
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationConfiguration.Client">
+            <summary>
+            Client configuration
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationConfiguration.UseValidation">
+            <summary>
+            Tells Validator whether to bother with validation or not--
+            BE VERY CAUTIOUS WHEN USING "FALSE" AS AN OPTION, IT LEAVES YOUR APPLICATION
+            MUCH OPEN TO ATTACK--should really only be used during testing.  
+            Even internal deployment with this option "false" is dangerous.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ApplicationConfiguration.Server">
+            <summary>
+            Server configuration
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.ValidatorConfiguration">
+            <summary>
+            The validator configuration class
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ValidatorConfiguration.Type">
+            <summary>
+            The type name for the validator. The type configured must implement 
+            the IValidator interface.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ValidatorConfiguration.Assembly">
+            <summary>
+            The assembly where the Type is defined.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.ValidatorConfiguration.Config">
+            <summary>
+            Configuration for the Validator
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderConfiguration">
+            <summary>
+            The downloader configuration
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderConfiguration.Type">
+            <summary>
+            The type name for the downloader. The type configured must implement 
+            the IDownload interface.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderConfiguration.Assembly">
+            <summary>
+            The assembly where the Type is defined.
+            </summary>
+        </member>
+        <member name="P:Microsoft.ApplicationBlocks.ApplicationUpdater.DownloaderConfiguration.Config">
+            <summary>
+            Configuration for the downloader provider
+            </summary>
+        </member>
+    </members>
+</doc>

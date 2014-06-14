@@ -1,0 +1,6 @@
+﻿HMEBgMHBAYDCgWGAwcEBgM	Richiesta collegamento (Ingresso Basso)
+HMEBgMHBAYDCgWHAwcEBgM	Richiesta collegamento (Ingresso Alto)
+HQEBgMHBAYDCgiHAwcEBgM	Manomissione (Ingresso Alto)
+HMEBgMHBAYDCgSGAwcEBgM	MAnomissione (Ingresso Basso)
+HQEBgMHBAYDCgSHAwcEns2t7PpfE4iV7Kxgru69RPkf36oGQwcEBgMHBAYDBwQG	Richiesta sicurezza massima
+eF7oGAwcEBgMHBAYDBwQG	Richiesta sicurezza minima

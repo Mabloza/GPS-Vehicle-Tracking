@@ -1,0 +1,68 @@
+﻿USE master
+GO
+IF  EXISTS (SELECT name FROM sys.databases WHERE name = 'Track')
+	DROP DATABASE Track
+GO
+CREATE DATABASE Track
+GO
+USE Track
+GO
+if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME='POI') drop table POI
+GO
+if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME='Obiettivi') drop table Obiettivi
+GO
+if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME='Position') drop table Position
+GO
+if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME='Utenti') drop table Utenti
+GO
+
+CREATE TABLE [Track].[dbo].POI
+(
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Descrizione] [varchar](100) NULL,
+	[Lat] [varchar](50) NULL,
+	[Lon] [varchar](50) NULL,
+);
+
+GO
+CREATE TABLE [Track].[dbo].[Obiettivi](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Descrizione] [varchar](100) NULL,
+	[Lat] [varchar](50) NULL,
+	[Lon] [varchar](50) NULL,
+ CONSTRAINT [PK_Obiettivi] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+CREATE TABLE [Track].[dbo].[Position](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[Vehicle] [varchar](50) NULL,
+	[Position] [text] NULL,
+	[DateTime] [varchar](50) NULL,
+ CONSTRAINT [PK_Position] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+CREATE TABLE [Track].[dbo].[Utenti](
+	[ID] [int] IDENTITY(1,1) NOT NULL,
+	[UserID] [varchar](50) NOT NULL,
+	[Password] [varchar](50) NOT NULL,
+	[Livello] [varchar](50) NOT NULL
+) ON [PRIMARY]
+
+GO
+
+INSERT INTO [Track].[dbo].[Utenti]
+           ([UserID]
+           ,[Password]
+           ,[Livello])
+     VALUES
+           ('M8+r5p5cubC4R1ahWltVQA==','M8+r5p5cubC4R1ahWltVQA==','pHiQ3rvDmEc7aEgADPaPWg==')

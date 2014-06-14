@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.JobStatus">
+            <summary>
+            The status of a multiple file Job
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.JobStatus.Ready">
+            <summary>
+            The download job has finished
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.JobStatus.Downloading">
+            <summary>
+            The server is still downloading the files
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.JobStatus.Error">
+            <summary>
+            There has been an error
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.JobStatus.Cancelled">
+            <summary>
+            The job was cancelled
+            </summary>
+        </member>
+        <member name="F:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.JobStatus.Validating">
+            <summary>
+            Once Validator starts working on a Job, it sets this to Validating to effectively "dequeue"
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IDownloader">
+            <summary>
+            The interface used to abstract the downloaded.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IDownloader.Init(System.Xml.XmlNode)">
+            <summary>
+            Initialization for the downloader
+            </summary>
+            <param name="config">Xml node with the configuration for the Downloader</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IDownloader.Download(System.String,System.String,System.TimeSpan)">
+            <summary>
+            Download synchronously a single file, the method does not return until download is finished
+            </summary>
+            <param name="sourceFile">Source file on the HTTP server to download</param>
+            <param name="destFile">The local file path</param>
+            <param name="maxTimeWait">The maximum time to wait for file download.</param>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IDownloader.BeginDownload(System.String[],System.String[])">
+            <summary>
+            Asynchronous download of a group of files.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IDownloader.GetJobStatus(System.Guid)">
+            <summary>
+            Returns the status for an asynchronous download job.
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IPostProcessor">
+            <summary>
+            Interface for post-processing assemblies.  they are downloaded during updates then activated to do post-processing when
+            validation is complete
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IPostProcessor.Run">
+            <summary>
+            well-known entry point for AppUpdater to call
+            </summary>
+        </member>
+        <member name="T:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IValidator">
+            <summary>
+            The interface used to extend the validation support after downloading a file.
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IValidator.Init(System.Xml.XmlNode)">
+            <summary>
+            Initialization method
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IValidator.Validate(System.String,System.String)">
+            <summary>
+            Validate the file specified
+            </summary>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IValidator.Validate(System.Xml.XmlNode,System.String)">
+            <summary>
+            Validate the given xml node
+            </summary>
+            <param name="xml">the xml to validate</param>
+            <param name="signature">the keyed-hash signature to validate agains</param>
+            <returns>true if xml node, hashed with our key, matches the signature</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IValidator.Sign(System.String,System.String)">
+            <summary>
+            Sign the given file by hashing the file with the given key, returning a byte array containing the hash signature
+            </summary>
+            <param name="filePath">full or relative path to file to sign</param>
+            <param name="key">the byte array key used to sign the hash</param>
+            <returns>a signed hash value for the whole file</returns>
+        </member>
+        <member name="M:Microsoft.ApplicationBlocks.ApplicationUpdater.Interfaces.IValidator.Sign(System.Xml.XmlNode,System.String)">
+            <summary>
+            Overload allows keyed-hashing of arbitrary xml node
+            </summary>
+            <param name="xml">the XmlNode containing contents to key-hash</param>
+            <param name="key">the hashing key</param>
+            <returns>a byte array containing the keyed hash</returns>
+        </member>
+    </members>
+</doc>

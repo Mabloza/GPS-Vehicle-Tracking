@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="ResMimeType">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="Version">
+		<value>1.0.0.0</value>
+	</resheader>
+	<resheader name="Reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=1.0.3102.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="Writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=1.0.3102.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	
+	
+	
+	
+	
+	<data name="RES_UnableToLoadConfiguration">
+		<value>Unable to load configuration from the XML configuration file: '{0}'.  
+		This can be caused by a number of problems, but the most common problem is an incorrectly configured Updater configuration file.  
+		The most probable sources of error are: missing nodes, incorrect attribute names, white space within attributes or within elements, 
+		white space between elements in the same sub-node, badly formed xml, or xml that does not conform to the ConfigSchema.XSD.</value>
+	</data>
+	<data name="RES_InvalidServerXmlFile">
+		<value>The XML file downloaded from the server is invalid (or incomplete), the following XPath must be satisfied: 
+		'/configuration/appUpdater/availableversion'.</value>
+	</data>
+	<data name="RES_InvalidClientXmlFile">
+		<value>The XML file on the client application is invalid (or incomplete), the following XPath must be satisfied: 
+		'/configuration/appUpdater/InstalledVersion'.</value>
+	</data>
+	<data name="RES_ValidationException">
+		<value>The validation process fails with the following exception message: 
+		'{0}' 
+		validating the file '{1}' for the application '{2}'.</value>
+	</data>
+	<data name="RES_ValidationFailed">
+		<value>The validation process failed for the file '{0}' within the application '{1}'.</value>
+	</data>
+	<data name="RES_CantLoadAssembly">
+		<value>The assembly '{0}' can't be loaded.  
+		Check that the assembly uses the FULLY QUALIFIED NAME, which consists of the assembly name, version, culture, and PublicKeyToken.</value>
+	</data>
+	<data name="RES_CantLoadTypeForAssembly">
+		<value>The type '{0}' can't be loaded within the assembly {1}.</value>
+	</data>
+	<data name="RES_CantCreateInstanceOfTypeAssembly">
+		<value>Can't create the instance for the type '{0}' on the assembly {1}.</value>
+	</data>
+	<data name="RES_EXCEPTION_ProcessingApplication">
+		<value>Unexpected error processing application the '{0}', error message: '{1}'.</value>
+	</data>
+	<data name="RES_InvalidServerXmlFileUpdateLocation">
+		<value>The downloaded server XML file defines a URI that is invalid--'{0}'.</value>
+	</data>
+	<data name="RES_InvalidPathOnAppLauncher">
+		<value>The configuration file '{0}' 
+		defines an invalid path at the node client/appLauncher, 
+		the invalid value is '{1}'.</value>
+	</data>
+	<data name="RES_InvalidPathOnBaseDir">
+		<value>The configuration file '{0}' 
+		defines an invalid path at the node client/baseDir, 
+		the invalid value is '{1}'.</value>
+	</data>
+	<data name="RES_InvalidPathOnBaseDirMustBeRooted">
+		<value>The configuration file '{0}' defines an invalid path at the node client/baseDir, 
+		the baseDir path must be rooted, 
+		the invalid value is '{1}'.</value>
+	</data>
+	<data name="RES_InvalidPathOnTempDir">
+		<value>The configuration file '{0}' 
+		defines an invalid path at the node client/tempDir, 
+		the invalid value is '{1}'.</value>
+	</data>
+	<data name="RES_ClientXmlFileMustExist">
+		<value>The configuration file '{0}' 
+		defines an invalid path at the node client/xmlFile; 
+		the invalid value is '{1}', this file must exist.</value>
+	</data>
+	<data name="RES_EXCEPTION_UsingDownloader">
+		<value>Unexpected error using the IDownloader of type '{0}' 
+		and from assembly '{1}' when a job was posted.</value>
+	</data>
+	<data name="RES_InvalidServerFileName">
+		<value>The following file (to be downloaded as part of update) 
+		named '{0}' specified in the server XML (manifest) file is invalid.</value>
+	</data>
+	<data name="RES_ErrorDownloadingJob">
+		<value>Error downloading files from the server for the application '{0}', 
+		the following message was in the exception: '{0}'.</value>
+	</data>
+	<data name="RES_ErrorInitializingValidator">
+		<value>Error initializing Validator provider, 
+		type:'{0}', 
+		assembly:'{1}'.</value>
+	</data>
+	<data name="RES_ErrorInitializingDownloader">
+		<value>Error initializing Downloader provider: 
+		type: '{0}', 
+		assembly: '{1}'.</value>
+	</data>
+	<data name="RES_InvalidClientVersionInfo">
+		<value>Invalid client version info '{0}'.</value>
+	</data>
+	<data name="RES_InvalidServerVersionInfo">
+		<value>Invalid server version info '{0}'.</value>
+	</data>
+	<data name="RES_GeneralUpdaterError">
+		<value>A general error occurred updating the application '{0}'.</value>
+	</data>
+	<data name="RES_EXCEPTION_CantRemoveMetadataFile">
+		<value>The metadata file '{0}' can't be removed.</value>
+	</data>
+	<data name="RES_EXCEPTION_MetadataCantBeDownloadedOrNotValid">
+		<value>The metadata file (the Server Manifest) can't be downloaded for the application '{0}'.
+		Either the manifest is unavailable (check download URL in Updater config file), the downloader failed, or 
+		the Manifest failed validation.</value>
+	</data>
+	<data name="RES_EXCEPTION_ServiceAlreadyRunning">
+		<value>The service is already running on this machine; please run only a single instance at a time.</value>
+	</data>
+	<data name="RES_EXCEPTION_ArgumentInvalidHexFormat">
+		<value>The string argument is an invalid format.</value>
+	</data>
+	<data name="RES_FileNotDownloaded">
+		<value>The file '{0}' cannot be downloaded. 
+		The failure occurred in the synchronous download method.  
+		The Server Manifest must be downloaded using this synchronous technique.  
+		It may be that the configuration file's 'maxWaitXmlFile' is too short.  Set it to at least 60,000 milliseconds 
+		(60 seconds; the value is expected to be in milliseconds).  
+		If you see this error repeatedly, it is probably because the wait timeout is too short, there are network problems, 
+		or the BITS service is not responding.  It may help to restart the BITS service.
+		It may also be that during debugging or under certain repetitive failures, the BITS services' "job queue" has become very 
+		large.  In this case, the BITS job queue should be flushed using the BITS COM interface.</value>
+	</data>
+	<data name="RES_BITSDescription">
+		<value>Updater: Download the Server XML File.</value>
+	</data>
+	<data name="RES_BITSJobName">
+		<value>Updater job.</value>
+	</data>
+	<data name="RES_EXCEPTION_CantCreateInstanceUsingActivate">
+		<value>Could not create an instance of the requested object in the Factory.  
+		Assembly = '{0}', 
+		Type = '{1}'.  
+		Check the configuration file--this is the most common source of this error.  
+		Assemblies must be specified by their FULLY QUALIFIED NAME, including name, version, culture, and public key token.  
+		Likewise, the TYPE that must be constructed must be specified by the FULL TYPE NAME, not just the class name.  
+		Type names are NOT necessarily just the "assembly.type" form; 
+		type names depend on namespace, which may or may not be the same as the assembly name.</value>
+	</data>
+	<data name="RES_EXCEPTION_PollingIntervalTooShort">
+		<value>The polling interval is too short, it should be 60 seconds or more.  Setting it to less can cause problems with locked files, 
+		and may produce race conditions in which manifests are downloaded while other files are still in process.</value>
+	</data>
+	<data name="RES_EXCEPTION_CantLoadAssembly">
+		<value>The assembly and type specified could not be loaded.  
+		The assembly name given is '{0}' 
+		and the type name given is '{1}'.  
+		Check to be SURE that the FULLY QUALIFIED ASSEMBLY NAME with assembly, version, culture, and PublicKeyToken is specified.  Check 
+		also that the type name is the FULL type name not the abbreviated type.  It is common to have incorrect versions or PublicKeyTokens, 
+		validate these and correct the config.  Likewise, the TYPE that must be constructed must be specified by the FULL TYPE NAME, 
+		not just the class name.  Type names are NOT necessarily just the "assembly.type" form; 
+		type names depend on namespace, which may or may not be the same as the assembly name.</value>
+	</data>
+	<data name="RES_EXCEPTION_UNCSourcePathToBITS">
+		<value>A UNC file path was used as the source for BITS downloading: 
+		'{0}'; this is invalid, source files for BITS must be URLs.  
+		Check the Server Manifest and be sure paths given to BITS as source paths are URLs.</value>
+	</data>
+	<data name="RES_CouldNotFindCryptographicKey">
+		<value>The key passed to the Validator was null.  
+		Check to be sure that the XML path "validator/key" is correct and that the key node contains a valid cryptographic key 
+		for the type of Validator being used.  A common error is to nest the key too deeply giving the Validator an unexpected XML structure. 
+		Other errors include: giving the wrong kind of key, encoding the key incorrectly, or omitting the key entirely.</value>
+	</data>
+	<data name="RES_EXCEPTION_CouldNotDeserializeServerApplicationInfo">
+		<value>Could not deserialize an instance of ServerApplicationInfo:  
+		error message was '{0}'.  
+		The path to the Server Manifest was '{1}'.</value>
+	</data>
+	<data name="RES_EXCEPTION_CouldNotDeserializeClientApplicationInfo">
+		<value>Could not deserialize an instance of ClientApplicationInfo:  
+		error message was '{0}'.  
+		The path to the Server Manifest was '{1}'.</value>
+	</data>
+	<data name="RES_EXCEPTION_CantCreateInstanceFromFilePath">
+		<value>Could not create an instance of the type specified by its file name and interface to return.  The file name given was '{0}' and the expected interface was '{1}'.  Check
+		 the configuration file, and be sure that the path is correct.  Also check that the assembly specified by path has at least one type that implements the given interface.  
+		 Likewise, the TYPE that must be constructed must be specified by the FULL TYPE NAME, not just the class name.  Type names are NOT necessarily always just the "assembly.type" form; 
+		 type names depend on namespace, which may or may not be the same as the assembly name.</value>
+	</data>
+	<data name="RES_EXCEPTION_BadTypeArgumentInFactory">
+		<value>When attempting to process a FULLY QUALIFIED TYPE AND ASSEMBLY NAME, there were fewer than FIVE total comma-delimited parts.  Check
+		 the configuration file, and be sure that the type and assembly attribute contents are correct. The assembly must specify NAME, VERSION, CULTURE, PUBLICKEYTOKEN.
+		   Instead what was specified was: 
+		   '{0}', '{1}', '{2}', '{3}', '{4}'.
+		   </value>
+	</data>
+	<data name="RES_EXCEPTION_SettingUpDownloadDirectories">
+		<value>There was an error setting up the download directories; DownloaderManager was attempting to create the destination directories and had an exception.  
+		Check that the destination directories are reachable; that they are not locked; that the process has permission to access them; 
+		and that the paths given in the Updater configuration for this application point to directories which exist.
+		 The file source path causing the error was 
+		 '{0}', 
+		 and the destination path was '{1}'.</value>
+	</data>
+	<data name="RES_TIEInBITS">
+		<value>The BITSDownloader was interrupted during a download by a ThreadInterruptException 
+		while downloading the file '{0}'.  
+		Usually this means the Updater was stopped in the middle of a download job and may simply mean the Service or other 
+		consuming application was stopped manually.
+		</value>
+	</data>
+	<data name="RES_EXCEPTION_DocumentNotValidated">
+		<value>There was an error during validation of the configuration file.  
+		The configuration file MUST pass validation according to the schema; 
+		please check that the configuration is well-formed and valid, and that it conforms to the XSD schema.  
+		Also avoid white space within elements.  
+		The validation message was: '{0}'."
+		</value>
+	</data>
+	<data name="RES_EXCEPTION_ErrorSavingClientApplicationInfo">
+		<value>Error while saving the ClientApplicationInfo object.  
+		This object corresponds to the 'AppStart.exe.config' file, and is used to update version and path information so that the 'shim' 
+		AppStart can find the newly updated application.  
+		The information passed in to Save this document was:  '{0}','{1}','{2}'.
+		</value>
+	</data>
+	<data name="RES_EXCEPTION_ConfigCantLoadInAUConstructor">
+		<value>SecurityException thrown while trying to register with ProcessExit event.  Make sure the assembly/user have adequate permissions.
+		</value>
+	</data>
+	<data name="RES_StopUpdaterInterruptThread">
+		<value>DownloaderManager thread named '{0}' had to be interrupted; it did not respond in the allotted timeout to the stop event.
+		</value>
+	</data>
+	<data name="RES_RestartedUpdater">
+		<value>Restarted a DownloaderManager for the application '{0}' at date/time '{1}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_CheckingOnUpdates">
+		<value>Checking on updates for application '{0}'.
+		</value>
+	</data>
+	<data name="RES_EXCEPTION_StoppingIPP">
+		<value>There was an error when stopping the PostProcessor thread named '{0}'.  
+		It was interrupted and threw a ThreadInterruptException; the message returned was: 
+		{1}.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_DownloadManifestStarted">
+		<value>  DOWNLOAD STARTED:   Downloading manifest for the application '{0}'.  Time started: {1}
+		</value>
+	</data>
+	<data name="RES_MESSAGE_SourceFileName">
+		<value>  SOURCE FILE:  '{0}'  
+		</value>
+	</data>
+	<data name="RES_MESSAGE_DestFileName">
+		<value>  DEST FILE:  '{0}'  
+		</value>
+	</data>
+	<data name="RES_MESSAGE_DownloadManifestCompleted">
+		<value>Server Manifest successfully downloaded to location '{0}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_FilesMustBeUpdated">
+		<value>The local files must be updated for the application '{0}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_DnldJobStatusUpdated">
+		<value>Status updated with job id '{0}' for the application '{1}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_NoNewVersionOnServer">
+		<value>There is no new version update available on the server for the application '{0}'
+		</value>
+	</data>
+	<data name="RES_MESSAGE_DownloadingAppFiles">
+		<value>Manifest downloaded, now commencing download of application files for application '{0}' 
+		to destination temporary folder '{1}'
+		</value>
+	</data>
+	<data name="RES_MESSAGE_SettingUpFileForDownload">
+		<value>
+SOURCE: '{0}'
+DEST:   '{1}'
+		</value>
+	</data>
+	<data name="RES_MESSAGE_ClientServerVersionCheck">
+		<value>The version currently on the client for application '{0}' is {1} and the version on the server is {2}.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_ValidatingFiles">
+		<value>Validating individual files for the application '{0}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_UpdatingLocalConfigFile">
+		<value>Updating the local configuration file, probably AppStart.exe.config depending on mode of deployment, for the application '{0}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_IPPWouldNotCast">
+		<value>Able to instantiate putative IPostProcessor, but it would not cast to IPostProcessor interface.  
+		The file path for IPP was '{0}' 
+		and the discovered type is '{1}'.
+		</value>
+	</data>
+	<data name="RES_EXCEPTION_ThreadInterruptedException">
+		<value>The thread named '{0}' had to be interrupted.
+		</value>
+	</data>
+	<data name="RES_EXCEPTION_RunningIPP">
+		<value>There was an error when attempting to start the Post Processor.
+		The given PostProcessor had the following attributes:  
+		Path--'{0}'; 
+		Type--'{1}'; 
+		Assembly--'{2}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_ValidatingManifest">
+		<value>Validating the downloaded server Manifest file located at: 
+		'{0}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_ManifestFailedValidation">
+		<value>  MANIFEST VALIDATION FAILED:  
+		The server Manifest located at 
+		'{0}' failed validation.  
+		It is being deleted; its signature did not match the signature of the file that was downloaded.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_FileFailedValidation">
+		<value>  FILE VALIDATION FAILED:    
+		The file '{0}' failed validation.  
+		Stopping validation, deleting all files to prevent questionable files from remaining.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_FileValidated">
+		<value>'{0}' PASSED VALIDATION.
+		</value>
+	</data>
+	<data name="RES_EXCEPTION_SigningFile">
+		<value>Error signing the file at path '{0}'.
+		</value>
+	</data>
+	<data name="RES_EXCEPTION_SigningXml">
+		<value>Error signing xml.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_DownloadComplete">
+		<value>
+Download Completed {0},{1},{2},{3},{4}.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_DeserializingClientApplicationInfo">
+		<value>Reading the configuration file '{0}' to deserialize it into a ClientApplicationInfo object.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_SavingClientApplicationInfo">
+		<value>Now saving ClientApplicationInfo object to file '{0}'.
+		</value>
+	</data>
+	<data name="RES_MESSAGE_DeserializeServerApplicationInfo">
+		<value>Reading Server Manifest file from '{0}' to deserialize into a ServerApplicationInfo object.
+		</value>
+	</data>
+	<data name="RES_CultureIDToGetCOMErrorStringsFormatted">
+		<value>1033</value>
+	</data>
+	<data name="RES_MESSAGE_ManifestFileNotDownloaded">
+		<value>The downloader failed to synchronously download a file with the path '{0}'.  
+		The cumulative error message generated during its attempts was: '{1}'.</value>
+	</data>
+	<data name="RES_EXCEPTION_BITSBackgroundCopyError">
+		<value>The BITS service returned an error for the job with the ID '{0}'; 
+		the job's name and description are '{1}' and '{2}'.  
+		The BITS service error message for this job is 
+		'{3}'.
+		This job has been canceled, and the DownloaderManager will attempt it again.  If you see this error frequently, you may have a mis-configuration, or another 
+		administrator process/user is canceling BITS jobs.
+		It is also possible that some mis-configuration of the Manifest file is causing BITS to have trouble with a source or destination path; 
+		be sure that all SOURCE paths are valid URLs, and that all DESTINATION paths are valid LOCAL UNC paths--__shares are not allowed__.</value>
+	</data>
+	<data name="RES_EXCEPTION_BITSOtherError">
+		<value>The BITS downloader experienced an unexpected error.  It may have been asked to check job status for a job ID that no longer exists, 
+		or a job that was canceled.  The jobID was '{0}', the job name was '{1}', and the description was '{2}'.</value>
+	</data>
+	<data name="RES_BITSFilesDownloadJobName">
+		<value>BITS_Files_Download_Job</value>
+	</data>
+	<data name="RES_BITSFilesDownloadDescription">
+		<value>BITS_Files_Download_Job</value>
+	</data>
+	<data name="RESX_MESSAGE_UpdaterStarted">
+		<value>The Updater has started; the target application's name is '{0}'.  Time started:  {1}.</value>
+	</data>
+	<data name="RESX_MESSAGE_UpdaterStopped">
+		<value>The Updater is stopping updates for the application named '{0}'.  Time stopped:  {1}.</value>
+	</data>
+	<data name="RESX_DateTimeToStringFormatLogFile">
+		<value>yyyy_MM_dd_HH_mm_ss</value>
+	</data>
+	<data name="RESX_DateTimeToStringFormat">
+		<value>yyyy_MM_dd_HH:mm:ss</value>
+	</data>
+	<data name="RES_MESSAGE_UpdaterLogDirectoryNotFound">
+		<value>The logging file's directory specified in the configuration file does not exist.  
+		The path given was '{0}'; please ensure
+		that the log file's directory exists, or logging will not function.</value>
+	</data>
+	<data name="RES_EXCEPTION_BaseDirMustExist">
+		<value>The configuration file at '{0}' contains an invalid value for the client/baseDir node.
+		The path given for the client's base directory was '{1}'; this path does not exist.
+		Be sure the baseDir exists on the client.</value>
+	</data>
+	<data name="RES_MESSAGE_UpdaterLogCannotBeWritten">
+		<value>The Updater Log file located at '{0}' cannot be opened to write to.  Check that the log file is in a directory that the user of Updater
+		 has access to, and be sure that the file itself can be created and written to by that user.  Also be sure there's enough disk space to 
+		 accomodate the log file.</value>
+	</data>
+	<data name="RES_EXCEPTION_DuplicateApplicationName">
+		<value>The application name '{0}' is a duplicate.  Application names must be unique to each Updater configuration file; 
+		if you wish to update multiple applications simultaneously, ensure that their names in the config file are unique.</value>
+	</data>
+	<data name="RES_EXCEPTION_ErrorStopUpdater">
+		<value>There was an error while stopping the Updater.  The application that was being stopped is named '{0}'.
+		This error often occurs when multiple threads attempt to stop the update at the same time.</value>
+	</data>
+	<data name="RES_EXCEPTION_UnauthorizedAccessFile">
+		<value>There was an error when attempting to access a file:
+		'{0}'.
+		The exception message was:
+		'{1}'.
+		Most often this occurs when the file that is being deleted/overwritten is marked "Read-Only"; be sure this is not the case, 
+		or the Updater will not be able to manipulate this file.</value>
+	</data>
+	<data name="RES_EXCEPTION_UnauthorizedAccessDirectory">
+		<value>There was an error when attempting to access a directory:
+		'{0}'.
+		The exception message was:
+		'{1}'.
+		Most often this occurs when the directory that is being deleted/overwritten is marked "Read-Only"; be sure this is not the case, 
+		or the Updater will not be able to manipulate this directory.</value>
+	</data>
+	<data name="RES_EXCEPTION_WaitedMoreThanTwicePollPeriod">
+		<value>
+		The download job has waited {0} milliseconds for the download.
+		The affected application '{1}' waited more than twice the allotted polling period for this download;
+		it is canceling and restarting the update job.</value>
+	</data>
+	<data name="RES_ExceptionInvalidExtendedFormatArguments">
+		<value>The extended format is invalid. Cache expiration time must be specified.</value>
+	</data>
+	<data name="RES_ExceptionInvalidConfigurationDocument">
+		<value>The configuration document is not a well-formed xml document.</value>
+	</data>
+	<data name="RES_ExceptionExtendedFormatIncorrectMinutePart">
+		<value>The minute part must be an integer between 0 and 59.</value>
+	</data>
+	<data name="RES_ExceptionExtendedFormatIncorrectHourPart">
+		<value>The hour part must be an integer between 0 and 23.</value>
+	</data>
+	<data name="RES_ExceptionExtendedFormatIncorrectDayPart">
+		<value>The day part must be an integer between 0 and 31.</value>
+	</data>
+	<data name="RES_ExceptionExtendedFormatIncorrectMonthPart">
+		<value>The month part must be an integer between 0 and 12.</value>
+	</data>
+	<data name="RES_ExceptionExtendedFormatIncorrectDayOfWeekPart">
+		<value>The day of week part must be an integer between 0 and 6.</value>
+	</data>
+	<data name="RES_CLSID_BackgroundCopyManager">
+		<value>4991D34B-80A1-4291-83B6-3328366B9097</value>
+	</data>
+	
+	
+	
+	
+</root>

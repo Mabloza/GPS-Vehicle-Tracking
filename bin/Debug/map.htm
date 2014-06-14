@@ -1,0 +1,282 @@
+﻿<html>
+   <head>
+      <title></title>
+      <meta http-equiv="Content-Type" content="text/html; 
+        charset=utf-8">
+      <!--<script src="http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6"></script>-->
+      
+      <script type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.2&mkt=it-IT"></script>            
+
+<script>
+
+          var map = null;
+
+          function GetMap()
+          {
+             map = new VEMap('myMap');
+             map.SetDashboardSize(VEDashboardSize.Normal);
+             map.LoadMap(new VELatLong(37.55278, 15.02116), 10 ,VEMapStyle.Shaded ,false);
+             map.Resize(GetWindowWidth(),GetWindowHeight());
+             map.HideDashboard();
+          }
+          
+          function SetMapStyleAerial()
+          {
+            map.LoadMap(new VELatLong(37.55278, 15.02116), 10 ,VEMapStyle.Aerial ,false);
+          }
+          
+          function SetMapStyleHibryd()
+          {
+            map.LoadMap(new VELatLong(37.55278, 15.02116), 10 ,VEMapStyle.Hybrid ,false);
+          }
+          
+          function setDivSize()
+          {
+             map.Resize(GetWindowWidth(),GetWindowHeight());
+    
+          }
+          
+          function SetMapZoomLevel(zoomLevel)
+          {
+                map.SetZoomLevel(zoomLevel);
+          }
+
+          function SetMapStyle(mapStyle)
+          {
+               map.SetMapStyle(mapStyle);
+          }
+          
+         function DoZoomIn(c)      
+         {        
+             map.ZoomIn();      
+         }          
+         
+         function DoZoomOut()      
+         {         
+             map.ZoomOut();      
+         }
+         
+         function ShowTurns(route)
+         {
+            var turns = "";
+
+            turns += "Distanza: " + route.Distance.toFixed(1) + " km";
+
+            turns += "\nTempo stimato: " + GetTime(route.Time) + "";
+
+            //if (dirsForm.dirsType[0].checked)
+            //{
+               // Unroll route and populate DIV
+               var legs          = route.RouteLegs;
+               var leg           = null;
+               var turnNum       = 0;  // The turn #
+
+               // Get intermediate legs
+               for(var i = 0; i < legs.length; i++)
+               {
+                  // Get this leg so we don't have to derefernce multiple times
+                  leg = legs[i];  // Leg is a VERouteLeg object
+
+                  var legNum = i + 1;
+                  turns += "\nDistanza per punto " + legNum + ": " + leg.Distance.toFixed(1) + " km" +
+                           "\nTempo per punto "     + legNum + ": " + GetTime(leg.Time) + "\n\n";
+
+                  // Unroll each intermediate leg
+                  var turn        = null;  // The itinerary leg
+                  var legDistance = null;  // The distance for this leg
+                  
+                  for(var j = 0; j < leg.Itinerary.Items.length; j ++)
+                  {
+                     turnNum++;
+                     
+                     turn = leg.Itinerary.Items[j];  // turn is a VERouteItineraryItem object
+
+                     turns += "" + turnNum + "\t" + turn.Text;
+
+                     legDistance    = turn.Distance;
+
+                     // So we don't show 0.0 for the arrival
+                     if(legDistance > 0)
+                     {
+                        // Round distances to 1/10ths
+                        turns += " (" + legDistance.toFixed(1) + " km";
+
+                        // Append time if found
+                        if(turn.Time != null)
+                        {
+                           turns += "; " + GetTime(turn.Time);
+                        }
+
+                        turns += ")\n";
+                     }
+                  }
+
+                  turns += "\n";
+             //  }
+
+               // Populate DIV with directions
+               alert(turns);
+               //return turns;
+               //routeResult.value=turns;
+            }
+         }
+         
+         
+         function getDistanceToPoint(lat1,lon1,lat2,lon2)
+         {
+            var options = new VERouteOptions;
+            options.DrawRoute = true;
+            options.SetBestMapView = false; 
+            options.ShowDisambiguation = false;
+            options.DistanceUnit = VERouteDistanceUnit.Kilometer;            
+            options.RouteCallback  = get_distance;
+            options.RouteOptimize = VERouteOptimize.MinimizeDistance;
+            
+            loc = new VELatLong(parseFloat(lat1),parseFloat(lon1));
+            destination = new VELatLong(parseFloat(lat2),parseFloat(lon2));
+            map.GetDirections([loc,destination],options);
+            
+             arrivo = new VELatLong(parseFloat(lat2),parseFloat(lon2));        
+             var shape = new VEShape(VEShapeType.Pushpin, arrivo );
+             shape.SetTitle("Obiettivo");
+             // Add shape to the map.
+             map.AddShape(shape);                      
+            
+         }
+         
+         function get_distance(route)
+         {
+            var turns = "";
+            turns += "Distanza: " + route.Distance.toFixed(1) + " km";
+            turns += "\nTempo stimato: " + GetTime(route.Time) + "";
+            alert(turns);
+         }
+         
+         // time is an integer representing seconds
+         // returns a formatted string
+         function GetTime(time)
+         {
+            if(time == null)
+            {
+               return("");
+            }
+
+            if(time > 60)
+            {                                 // if time == 100
+               var seconds = time % 60;       // seconds == 40
+               var minutes = time - seconds;  // minutes == 60
+               minutes     = minutes / 60;    // minutes == 1
+
+
+               if(minutes > 60)
+               {                                     // if minutes == 100
+                  var minLeft = minutes % 60;        // minLeft    == 40
+                  var hours   = minutes - minLeft;   // hours      == 60
+                  hours       = hours / 60;          // hours      == 1
+
+                  return(hours + " ore, " + minLeft + " minuti, " + seconds + " secondi");
+               }
+               else
+               {
+                  return(minutes + " minuti, " + seconds + " secondi");
+               }
+            }
+            else
+            {
+               return(time + " secondi");
+            }
+         }
+
+         function getRouteToPoint(lat1,lon1,lat2,lon2)
+         //function getRouteToPoint(lat1,lon1,dest)
+         {
+            var options = new VERouteOptions;
+            options.DrawRoute = true;
+            options.SetBestMapView = false; 
+            options.ShowDisambiguation = false;
+            options.DistanceUnit = VERouteDistanceUnit.Kilometer;            
+            options.RouteCallback  = ShowTurns;
+            options.RouteOptimize = VERouteOptimize.MinimizeDistance;
+            
+            loc = new VELatLong(parseFloat(lat1),parseFloat(lon1));
+            if(lon2!=null)
+                dest = new VELatLong(parseFloat(lat2),parseFloat(lon2));
+            else
+                dest = lat2;
+                
+            map.GetDirections([loc,dest],options);
+            
+         }
+
+        var locs = new Array; // An array for store locations
+        var loc;
+
+        //To add the Pushpin object on the map.
+        function AddPushPinOnMap(lat, lng, description,imei,icon_path,center)
+        {
+        
+                loc = new VELatLong(parseFloat(lat),parseFloat(lng));
+        
+                // Store the location in an array.
+                locs.push(loc);            
+        
+                var shape = new VEShape(VEShapeType.Pushpin, loc );
+
+                // Set custom icon for the pushpin.
+                shape.SetTitle(description);
+                shape.SetDescription(imei);
+                //if(icon_path)
+               // {
+               	shape.SetCustomIcon("<span style='font-family:Arial; font-size:x-small;" +
+                                    "color:Black; background-color:transparent'>" +
+                                    "<img src='"+icon_path+"'/></span>");
+               // }
+        
+                // Add shape to the map.
+                map.AddShape(shape);                      
+                
+                if(center!=null)
+                {
+                    map.SetCenter(new VELatLong(lat, lng));
+                }
+        }
+        
+                //To add the Pushpin object on the map.
+        function AddPolygonPinOnMap(lat, lon, description)
+        {
+                var shape = new VEShape(VEShapeType.Polygon, [  new VELatLong(lat,lon-0.015),
+                                                                new VELatLong(lat+0.01,lon-0.005),
+                                                                new VELatLong(lat+0.01,lon+0.005),
+                                                                new VELatLong(lat,lon+0.015),
+                                                                new VELatLong(lat-0.01,lon+0.005),
+                                                                new VELatLong(lat-0.01,lon-0.005)]);
+                shape.SetTitle(description);
+                // Add shape to the map.
+                map.AddShape(shape);                      
+        }
+
+
+        // To set map view.
+        function SetBestMapView()
+        {
+            map.SetMapView(locs);
+        }
+
+        function ClearMap()
+        {
+            // Remove all pushpins on the map.
+            map.Clear();
+            map.DeleteAllShapes();
+            
+            loc = null;
+            locs = new Array; 
+        }
+
+</script>
+   </head>
+    
+  <body onload="GetMap();" scroll="no" onresize="setDivSize()"
+    style="height:100%; width:100%" >
+        <div id='myMap' style="position: relative; width:100%; height:100%"></div>      
+  </body>   
+</html>
